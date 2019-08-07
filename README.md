@@ -1,10 +1,10 @@
 ## Transferable Semi-supervised 3D Object Detection from RGB-D Data
 
-![network](docs/network.pdf)
+![network](https://github.com/yewsiang/Transferable3D/blob/master/docs/network.pdf)
 
 ## Introduction
 
-![teaser](docs/teaser.pdf)
+![teaser](https://github.com/yewsiang/Transferable3D/blob/master/docs/teaser.pdf)
 
 We investigate the direction of training a 3D object detector for new object classes from only 2D bounding box labels of these new classes, while simultaneously transferring information from 3D bounding box labels of the existing classes. To this end, we propose a transferable semi-supervised 3D object detection model that learns a 3D object detector network from training data with two disjoint sets of object classes - a set of strong classes with both 2D and 3D box labels, and another set of weak classes with only 2D box labels. In particular, we suggest a relaxed reprojection loss, box prior loss and a Box-to-Point Cloud Fit network that allow us to effectively transfer useful 3D information from the strong classes to the weak classes during training, and consequently, enable the network to detect 3D objects in the weak classes during inference. Experimental results show that our proposed algorithm outperforms baseline approaches and achieves promising results compared to fully-supervised approaches on the SUN-RGBD and KITTI datasets. Furthermore, we show that our Box-to-Point Cloud Fit network improves performances of the fully-supervised approaches on both datasets.
 
@@ -157,7 +157,7 @@ python sunrgbd_detection/train_semisup_adv.py --SEMI_MODEL F \
 
 #### SUN-RGBD
 
-![qual_results](docs/qual_results.pdf)
+![qual_results](https://github.com/yewsiang/Transferable3D/blob/master/docs/qual_results.pdf)
 
 To run on 2D detections, you will have to first extract the proposals using `sunrgbd/sunrgbd_data.py`, which will store it into a `zip.pickle` file. Suppose that file is `test_FasterRCNN_TrainedOnTrainval.zip.pickle`, then we:
 
@@ -187,7 +187,7 @@ Open `Transferable3D/evaluation/sunrgbd/detection/script_3Deval.m` in MATLAB, ch
 
 ### Visualization
 
-![vis](docs/vis.pdf)
+![vis](https://github.com/yewsiang/Transferable3D/blob/master/docs/vis.pdf)
 
 #### SUN-RGBD
 
