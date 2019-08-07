@@ -1,7 +1,14 @@
 ## Transferable Semi-supervised 3D Object Detection from RGB-D Data
 
+![network](docs/network.pdf)
+
 ## Introduction
-Given two disjoint sets of classes (A and B), the objective of this work is to learn 3D object detectors to perform inference on classes B despite only having 2D + 3D bounding box labels of classes A and 2D bounding box labels of classes B, i.e. we do not require 3D bounding box labels of classes B. In this semi-supervised 3D object detection setting, we leverage upon Frustum PointNets as our backbone network, a novel Box-to-Point-Cloud Fit (BoxPC) network and novel loss functions to achieve promising performance on SUN-RGBD and KITTI datasets.
+
+![teaser](docs/teaser.pdf)
+
+We investigate the direction of training a 3D object detector for new object classes from only 2D bounding box labels of these new classes, while simultaneously transferring information from 3D bounding box labels of the existing classes. To this end, we propose a transferable semi-supervised 3D object detection model that learns a 3D object detector network from training data with two disjoint sets of object classes - a set of strong classes with both 2D and 3D box labels, and another set of weak classes with only 2D box labels. In particular, we suggest a relaxed reprojection loss, box prior loss and a Box-to-Point Cloud Fit network that allow us to effectively transfer useful 3D information from the strong classes to the weak classes during training, and consequently, enable the network to detect 3D objects in the weak classes during inference. Experimental results show that our proposed algorithm outperforms baseline approaches and achieves promising results compared to fully-supervised approaches on the SUN-RGBD and KITTI datasets. Furthermore, we show that our Box-to-Point Cloud Fit network improves performances of the fully-supervised approaches on both datasets.
+
+More concretely, given two disjoint sets of classes (strong classes A and weak classes B), the objective of this work is to learn 3D object detectors to perform inference on classes B despite only having 2D + 3D bounding box labels of classes A and 2D bounding box labels of classes B, i.e. we do not require 3D bounding box labels of classes B.
 
 ## Citation
 
@@ -36,11 +43,18 @@ We let Classes A = {bed, chair, toilet, desk, bathtub} and Classes B = {table, s
 
 Before running the code below, replace NAME_A1, NAME_B1 and NAME_C1 to your desired names. Also, in most of the code, there would be a path `/home/yewsiang/Transferable3D/` that you have to change to your own directory.
 
-You can either run the script at `Transferable3D/scripts/semisup_bed.sh` (run `chmod +x scripts/semisup_bed.sh` and cd to `Transferable3D/` first) or run the following 3 commands yourself:
+You can either run the script
+
+```
+scripts/semisup_bed.sh 
+```
+
+(run `chmod +x scripts/semisup_bed.sh` and cd to `Transferable3D/` first) or run the following 3 commands yourself:
 
 a) Pretrain Backbone network
 
-Run `python sunrgbd_detection/train_semisup.py --model semisup_v1_sunrgbd \
+```
+python sunrgbd_detection/train_semisup.py --model semisup_v1_sunrgbd \
 --batch_size 32 --max_epoch 31 --SEMI_MODEL A \
 --SUNRGBD_SEMI_TRAIN_CLS bed chair toilet desk bathtub \
 --SUNRGBD_SEMI_TEST_CLS table sofa dresser night_stand bookshelf \
@@ -48,22 +62,26 @@ Run `python sunrgbd_detection/train_semisup.py --model semisup_v1_sunrgbd \
 --SEMI_SAMPLING_METHOD BATCH --SEMI_USE_LABELS2D_OF_CLASSES3D 1 \
 --SEMI_SAMPLE_EQUAL_CLASS_WITH_PROB 0 --WEAK_REPROJECTION_CLIP_PRED_BOX 0 \
 --WEAK_REPROJECTION_CLIP_LOWERB_LOSS 0 --WEAK_WEIGHT_SURFACE 0 \
---WEAK_WEIGHT_REPROJECTION 0`
+--WEAK_WEIGHT_REPROJECTION 0
+```
 
 b) Pretrain Box-PC Fit model
 
-Run `python sunrgbd_detection/train_boxpc.py --BOX_PC_MASK_REPRESENTATION A \
+```
+python sunrgbd_detection/train_boxpc.py --BOX_PC_MASK_REPRESENTATION A \
 --SUNRGBD_SEMI_TRAIN_CLS bed chair toilet desk bathtub \
 --SUNRGBD_SEMI_TEST_CLS table sofa dresser night_stand bookshelf \
 --log_dir [NAME_B1] --train_data trainval_aug5x \ 
 --BOXPC_SAMPLING_METHOD SAMPLE --BOXPC_DELTA_LOSS_TYPE huber \
 --BOXPC_NOFIT_BOUNDS 0.01 0.25 --BOXPC_FIT_BOUNDS 0.7 1.0 \
 --BOXPC_CENTER_PERTURBATION 0.8 --BOXPC_SIZE_PERTURBATION 0.2 \
---BOXPC_ANGLE_PERTURBATION 3.1415 --BOXPC_WEIGHT_DELTA 4`
+--BOXPC_ANGLE_PERTURBATION 3.1415 --BOXPC_WEIGHT_DELTA 4
+```
 
 c) Training of Semi-supervised Model
 
-Run `python sunrgbd_detection/train_semisup_adv.py --SEMI_MODEL F \
+```
+python sunrgbd_detection/train_semisup_adv.py --SEMI_MODEL F \
 --BOX_PC_MASK_REPRESENTATION A --max_epoch 31 --use_one_hot \
 --SUNRGBD_SEMI_TRAIN_CLS bed chair toilet desk bathtub \
 --SUNRGBD_SEMI_TEST_CLS table sofa dresser night_stand bookshelf \
@@ -76,16 +94,23 @@ Run `python sunrgbd_detection/train_semisup_adv.py --SEMI_MODEL F \
 --SEMI_BOXPC_FIT_ONLY_ON_2D_CLS 1 --SEMI_INTRACLSDIMS_ONLY_ON_2D_CLS 1 \
 --WEAK_REPROJECTION_ONLY_ON_2D_CLS 1 --SEMI_WEIGHT_BOXPC_FIT_LOSS 1 \
 --WEAK_WEIGHT_INTRACLASSVAR 2 --WEAK_WEIGHT_REPROJECTION 0 \
---SEMI_MULTIPLIER_FOR_WEAK_LOSS 0.05 --SEMI_BOXPC_MIN_FIT_LOSS_AFT_REFINE 1`
-
+--SEMI_MULTIPLIER_FOR_WEAK_LOSS 0.05 --SEMI_BOXPC_MIN_FIT_LOSS_AFT_REFINE 1
+```
 
 <b>Similarly, we need to perform the reverse direction: To test on B in the semi-supervised setting, we train on 2D labels from B and 2D + 3D labels from A.</b> Main difference with the top is that we specify `--SUNRGBD_SEMI_TRAIN_CLS table sofa dresser night_stand bookshelf --SUNRGBD_SEMI_TEST_CLS bed chair toilet desk bathtub`.
 
-You can either run the script at `Transferable3D/scripts/semisup_table.sh` (run `chmod +x scripts/semisup_table.sh` and cd to `Transferable3D/` first) or run the following 3 commands yourself:
+You can either run the script
+
+```
+scripts/semisup_table.sh
+```
+
+ (run `chmod +x scripts/semisup_table.sh` and cd to `Transferable3D/` first) or run the following 3 commands yourself:
 
 a) Pretrain Backbone network
 
-Run `python sunrgbd_detection/train_semisup.py --model semisup_v1_sunrgbd \
+```
+python sunrgbd_detection/train_semisup.py --model semisup_v1_sunrgbd \
 --batch_size 32 --max_epoch 31 --SEMI_MODEL A \
 --SUNRGBD_SEMI_TRAIN_CLS table sofa dresser night_stand bookshelf \
 --SUNRGBD_SEMI_TEST_CLS bed chair toilet desk bathtub \
@@ -93,22 +118,26 @@ Run `python sunrgbd_detection/train_semisup.py --model semisup_v1_sunrgbd \
 --SEMI_SAMPLING_METHOD BATCH --SEMI_USE_LABELS2D_OF_CLASSES3D 1 \
 --SEMI_SAMPLE_EQUAL_CLASS_WITH_PROB 0 --WEAK_REPROJECTION_CLIP_PRED_BOX 0 \
 --WEAK_REPROJECTION_CLIP_LOWERB_LOSS 0 --WEAK_WEIGHT_SURFACE 0 \
---WEAK_WEIGHT_REPROJECTION 0`
+--WEAK_WEIGHT_REPROJECTION 0
+```
 
 b) Pretrain Box-PC Fit model
 
-Run `python sunrgbd_detection/train_boxpc.py --BOX_PC_MASK_REPRESENTATION A \
+```
+python sunrgbd_detection/train_boxpc.py --BOX_PC_MASK_REPRESENTATION A \
 --SUNRGBD_SEMI_TRAIN_CLS table sofa dresser night_stand bookshelf \
 --SUNRGBD_SEMI_TEST_CLS bed chair toilet desk bathtub \
 --log_dir [NAME_B2] --train_data trainval_aug5x \
 --BOXPC_SAMPLING_METHOD SAMPLE --BOXPC_DELTA_LOSS_TYPE huber \
 --BOXPC_NOFIT_BOUNDS 0.01 0.25 --BOXPC_FIT_BOUNDS 0.7 1.0 \
 --BOXPC_CENTER_PERTURBATION 0.8 --BOXPC_SIZE_PERTURBATION 0.2 \
---BOXPC_ANGLE_PERTURBATION 3.1415 --BOXPC_WEIGHT_DELTA 4`
+--BOXPC_ANGLE_PERTURBATION 3.1415 --BOXPC_WEIGHT_DELTA 4
+```
 
 c) Training of Semi-supervised Model
 
-Run `python sunrgbd_detection/train_semisup_adv.py --SEMI_MODEL F \
+```
+python sunrgbd_detection/train_semisup_adv.py --SEMI_MODEL F \
 --BOX_PC_MASK_REPRESENTATION A --max_epoch 31 --use_one_hot \
 --SUNRGBD_SEMI_TRAIN_CLS table sofa dresser night_stand bookshelf \
 --SUNRGBD_SEMI_TEST_CLS bed chair toilet desk bathtub \
@@ -121,29 +150,36 @@ Run `python sunrgbd_detection/train_semisup_adv.py --SEMI_MODEL F \
 --SEMI_BOXPC_FIT_ONLY_ON_2D_CLS 1 --SEMI_INTRACLSDIMS_ONLY_ON_2D_CLS 1 \
 --WEAK_REPROJECTION_ONLY_ON_2D_CLS 1 --SEMI_WEIGHT_BOXPC_FIT_LOSS 1 \
 --WEAK_WEIGHT_INTRACLASSVAR 2 --WEAK_WEIGHT_REPROJECTION 0 \
---SEMI_MULTIPLIER_FOR_WEAK_LOSS 0.05 --SEMI_BOXPC_MIN_FIT_LOSS_AFT_REFINE 1`
+--SEMI_MULTIPLIER_FOR_WEAK_LOSS 0.05 --SEMI_BOXPC_MIN_FIT_LOSS_AFT_REFINE 1
+```
 
 ### Evaluation
 
 #### SUN-RGBD
 
+![qual_results](docs/qual_results.pdf)
+
 To run on 2D detections, you will have to first extract the proposals using `sunrgbd/sunrgbd_data.py`, which will store it into a `zip.pickle` file. Suppose that file is `test_FasterRCNN_TrainedOnTrainval.zip.pickle`, then we:
 
 a) Make predictions and store into [PRED_A1]
 
-Run `python sunrgbd_detection/test_semisup.py --test B \
+```
+python sunrgbd_detection/test_semisup.py --test B \
 --model semisup_v1_sunrgbd --semi_type F --use_one_hot \
 --model_path experiments_adv/[NAME_C1]/model_epoch_30.ckpt \
 --data_path frustums/test.zip.pickle \
---output [PRED_A1] --pred_prefix 'F2_' --refine 1 --from_rgb_detection`
+--output [PRED_A1] --pred_prefix 'F2_' --refine 1 --from_rgb_detection
+```
 
 If you do not want to evaluate from RGB detections but from 2D ground truths:
 
-Run `python sunrgbd_detection/test_semisup.py --test B \
+```
+python sunrgbd_detection/test_semisup.py --test B \
 --model semisup_v1_sunrgbd --semi_type F --use_one_hot \
 --model_path experiments_adv/[NAME_C1]/model_epoch_30.ckpt \
 --data_path frustums/test_FasterRCNN_TrainedOnTrainval.zip.pickle \
---output [PRED_A1] --pred_prefix 'F2_' --refine 1`
+--output [PRED_A1] --pred_prefix 'F2_' --refine 1
+```
 
 b) Evaluate the [PRED_A1] predictions using MATLAB script
 
@@ -151,7 +187,7 @@ Open `Transferable3D/evaluation/sunrgbd/detection/script_3Deval.m` in MATLAB, ch
 
 ### Visualization
 
-![vis](https://github.com/yewsiang/Transferable3D/tree/master/docs/vis.png)
+![vis](docs/vis.pdf)
 
 #### SUN-RGBD
 
