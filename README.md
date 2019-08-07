@@ -1,10 +1,9 @@
 ## Transferable Semi-supervised 3D Object Detection from RGB-D Data
 
-![network](https://github.com/yewsiang/Transferable3D/blob/master/docs/network.jpg)
+![teaser](https://github.com/yewsiang/Transferable3D/blob/master/docs/teaser.jpg)
 
 ## Introduction
 
-<center><img src="https://github.com/yewsiang/Transferable3D/blob/master/docs/teaser.jpg" width="540px"/></center>
 
 We investigate the direction of training a 3D object detector for new object classes from only 2D bounding box labels of these new classes, while simultaneously transferring information from 3D bounding box labels of the existing classes. To this end, we propose a transferable semi-supervised 3D object detection model that learns a 3D object detector network from training data with two disjoint sets of object classes - a set of strong classes with both 2D and 3D box labels, and another set of weak classes with only 2D box labels. In particular, we suggest a relaxed reprojection loss, box prior loss and a Box-to-Point Cloud Fit network that allow us to effectively transfer useful 3D information from the strong classes to the weak classes during training, and consequently, enable the network to detect 3D objects in the weak classes during inference. Experimental results show that our proposed algorithm outperforms baseline approaches and achieves promising results compared to fully-supervised approaches on the SUN-RGBD and KITTI datasets. Furthermore, we show that our Box-to-Point Cloud Fit network improves performances of the fully-supervised approaches on both datasets.
 
@@ -35,6 +34,8 @@ Change directory with `cd Transferable3D/sunrgbd`, then run `python sunrgbd_data
 This for TensorFlow training pipeline. It will prepare frustum point clouds and labels and save them to zipped pickle files in `sunrgbd/frustums`.
 
 ### Training Semi-supervised Frustum PointNets
+
+![network](https://github.com/yewsiang/Transferable3D/blob/master/docs/network.jpg)
 
 #### SUN-RGBD
 
@@ -191,7 +192,7 @@ Open `Transferable3D/evaluation/sunrgbd/detection/script_3Deval.m` in MATLAB, ch
 
 #### SUN-RGBD
 
-There are somne visualizations that can be ran with `sunrgbd_detection/viewer.py`. If you wish to use them, you will need to install vtk.
+There are some visualizations that you can run with `sunrgbd_detection/viewer.py`. If you wish to use them, you will need to install `vtk`.
 
 Possible actions while viewing the point clouds:
 - Pressing `s`: takes a screenshot of the point cloud
