@@ -5,12 +5,12 @@ Given two disjoint sets of classes (A and B), the objective of this work is to l
 
 ## Citation
 
-@article{tang2019transferable3D,
-  title={Transferable Semi-supervised 3D Object Detection from RGB-D Data},
-  author={Tang, Yew Siang and Lee, Gim Hee},
-  journal={arXiv preprint arXiv:1904.10300},
-  year={2019}
-}
+        @article{tang2019transferable3D,
+          title={Transferable Semi-supervised 3D Object Detection from RGB-D Data},
+          author={Tang, Yew Siang and Lee, Gim Hee},
+          journal={arXiv preprint arXiv:1904.10300},
+          year={2019}
+        }
 
 ## Usage
 
@@ -150,6 +150,8 @@ b) Evaluate the [PRED_A1] predictions using MATLAB script
 Open `Transferable3D/evaluation/sunrgbd/detection/script_3Deval.m` in MATLAB, change the necessary files and variables before executing the code.
 
 ### Visualization
+
+![vis](https://github.com/yewsiang/Transferable3D/tree/master/docs/vis.png)
 
 #### SUN-RGBD
 

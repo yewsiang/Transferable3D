@@ -1,0 +1,10 @@
+*.pyc
+*.hidden
+*.Rhistory
+
+sunrgbd/frustums/*
+sunrgbd/predictions2D/*
+sunrgbd/predictions3D/*
+sunrgbd/experiments/*
+sunrgbd/experiments_adv/*
+sunrgbd/experiments_boxpc/*
